@@ -18,7 +18,7 @@ limitations under the License.
 @author: RJ Regenold
 '''
 
-from binarylion.variance import AppFacade
+from binarylion.variance import AppFacade, proxy, enum
 
 from puremvc.patterns.mediator import Mediator
 from puremvc.interfaces import IMediator
@@ -29,6 +29,25 @@ class PeriodPanelMediator(Mediator, IMediator):
     NAME = 'period panel mediator'
     def __init__(self, viewComponent):
         Mediator.__init__(self, PeriodPanelMediator.NAME, viewComponent)
+        # Add event listeners
+        self.viewComponent.radioBox.Bind(wx.EVT_RADIOBOX, self.onPeriodChange)
+    def listNotificationInterests(self):
+        return [
+            AppFacade.ENVIRONMENT_READY
+        ]
+    def handleNotification(self, note):
+        if note.getName() == AppFacade.ENVIRONMENT_READY:
+            self.setDefaultValue()
+    def setDefaultValue(self):
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        print prefs.prefs().period
+        index = enum.PERIOD_VALUES.getIndex(prefs.prefs().period)
+        print index
+        self.viewComponent.radioBox.SetSelection(index)
+    def onPeriodChange(self, e):
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        prefs.prefs().period = enum.PERIOD_VALUES.items[self.viewComponent.radioBox.GetSelection()]['value']
+        print prefs.prefs().period
 
 class ActionsPanelMediator(Mediator, IMediator):
     '''The actions panel mediator.'''

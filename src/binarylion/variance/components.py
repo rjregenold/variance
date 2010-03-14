@@ -20,6 +20,7 @@ limitations under the License.
 '''
 
 import wx
+from binarylion.variance import enum
 
 # The app border size
 APP_BORDER = 10
@@ -74,7 +75,7 @@ class PeriodPanel(wx.Panel):
         wx.Panel.__init__(self, *args, **kwargs)
         self.createChildren()
     def createChildren(self):
-        self.radioBox = wx.RadioBox(self, majorDimension=1, label='Change my wallpaper:', choices=['Every time I log in', 'Every hour', 'Every 30 minutes'])
+        self.radioBox = wx.RadioBox(self, majorDimension=1, label='Change my wallpaper:', choices=enum.PERIOD_VALUES.toStringList())
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.Add(self.radioBox, 0)
         

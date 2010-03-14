@@ -18,7 +18,7 @@ limitations under the License.
 @author: RJ Regenold
 '''
 
-from binarylion.variance import model, enum
+from binarylion.variance import model, enum, AppFacade
 
 import os, winshell
 from puremvc.interfaces import IProxy
@@ -46,6 +46,7 @@ class EnvProxy(Proxy, IProxy):
             session.add(model.Pref(enum.PREF_KEYS.STARTUP, 'True'))
             session.add(model.Pref(enum.PREF_KEYS.PERIOD, enum.PERIOD.EVERY_LOG_IN))
             session.commit()
+        self.facade.sendNotification(AppFacade.DATABASE_READY)
         
 class PrefsProxy(Proxy, IProxy):
     '''The prefs proxy.'''
@@ -70,5 +71,15 @@ class PrefsProxy(Proxy, IProxy):
             session.commit()
         except exc.IntegrityError:
             print 'Something bad happened.'
+    def load(self):
+        for pref in Session().query(model.Pref).all():
+            print pref
+            if pref.key == enum.PREF_KEYS.IMG_DIR:
+                self.prefs().imgDir = pref.value
+            elif pref.key == enum.PREF_KEYS.STARTUP:
+                self.prefs().startup = pref.value
+            elif pref.key == enum.PREF_KEYS.PERIOD:
+                self.prefs().period = pref.value
+        print self.prefs()
     def prefs(self):
         return self.data

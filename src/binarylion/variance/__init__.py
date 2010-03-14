@@ -23,6 +23,8 @@ from puremvc.patterns.facade import Facade
 class AppFacade(Facade):
     '''The application facade.'''
     STARTUP = 'startup'
+    DATABASE_READY = 'database ready'
+    ENVIRONMENT_READY = 'env ready'
     APPLY_CHANGES = 'apply changes'
     @staticmethod
     def getInstance():

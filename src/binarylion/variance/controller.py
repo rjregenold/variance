@@ -39,11 +39,13 @@ class ViewInitCommand(SimpleCommand, ICommand):
     '''Command that registers mediators.'''
     def execute(self, note):
         appPanel = note.getBody()
+        self.facade.registerMediator(view.PeriodPanelMediator(appPanel.periodPanel))
         self.facade.registerMediator(view.ActionsPanelMediator(appPanel.actionsPanel))
         
 class CommandInitCommand(SimpleCommand, ICommand):
     '''Command that registers other commands.'''
     def execute(self, note):
+        self.facade.registerCommand(AppFacade.DATABASE_READY, DatabaseReadyCommand)
         self.facade.registerCommand(AppFacade.APPLY_CHANGES, ApplyChangesCommand)
     
 class ModelInitCommand(SimpleCommand, ICommand):
@@ -51,10 +53,14 @@ class ModelInitCommand(SimpleCommand, ICommand):
     def execute(self, note):
         self.facade.registerProxy(proxy.EnvProxy())
         self.facade.registerProxy(proxy.PrefsProxy())
+        
+class DatabaseReadyCommand(SimpleCommand, ICommand):
+    def execute(self, note):
+        self.facade.retrieveProxy(proxy.PrefsProxy.NAME).load()
+        self.facade.sendNotification(AppFacade.ENVIRONMENT_READY)
     
 class ApplyChangesCommand(SimpleCommand, ICommand):
     def execute(self, note):
         print 'Saving changes'
         prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
-        print prefs.getImgDir()
         prefs.save()
