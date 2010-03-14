@@ -18,26 +18,33 @@ limitations under the License.
 @author: RJ Regenold
 '''
 
-import puremvc.patterns.command
-import puremvc.interfaces
+from binarylion.variance import AppFacade, view
+
+from puremvc.interfaces import ICommand
+from puremvc.patterns.command import SimpleCommand, MacroCommand
         
-class StartupCommand(puremvc.patterns.command.MacroCommand, puremvc.interfaces.ICommand):
+class StartupCommand(MacroCommand, ICommand):
     def initializeMacroCommand(self):
         self.addSubCommand(ModelInitCommand)
         self.addSubCommand(ViewInitCommand)
         self.addSubCommand(CommandInitCommand)
         
-class ViewInitCommand(puremvc.patterns.command.SimpleCommand, puremvc.interfaces.ICommand):
+class ViewInitCommand(SimpleCommand, ICommand):
     '''Command that registers mediators.'''
     def execute(self, note):
-        appFrame = note.getBody()
+        appPanel = note.getBody()
+        self.facade.registerMediator(view.ActionsPanelMediator(appPanel.actionsPanel))
         
-class CommandInitCommand(puremvc.patterns.command.SimpleCommand, puremvc.interfaces.ICommand):
+class CommandInitCommand(SimpleCommand, ICommand):
     '''Command that registers other commands.'''
     def execute(self, note):
-        pass
+        self.facade.registerCommand(AppFacade.APPLY_CHANGES, ApplyChangesCommand)
     
-class ModelInitCommand(puremvc.patterns.command.SimpleCommand, puremvc.interfaces.ICommand):
+class ModelInitCommand(SimpleCommand, ICommand):
     '''Command that registers proxies.'''
     def execute(self, note):
         pass
+    
+class ApplyChangesCommand(SimpleCommand, ICommand):
+    def execute(self, note):
+        print 'Saving changes'

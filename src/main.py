@@ -26,6 +26,6 @@ from binarylion.variance import AppFacade, components
         
 if __name__ == '__main__':
     app = AppFacade.getInstance()
-    wxApp = components.WxApp()
-    app.sendNotification(AppFacade.STARTUP, wxApp.appFrame)
+    wxApp = components.WxApp(False)
+    app.sendNotification(AppFacade.STARTUP, wxApp.appFrame.appPanel)
     wxApp.MainLoop()

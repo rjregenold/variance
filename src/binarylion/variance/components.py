@@ -21,6 +21,8 @@ limitations under the License.
 
 import wx
 
+# The app border size
+APP_BORDER = 10
 # The standard component border size
 COMPONENT_BORDER = 5
 
@@ -28,37 +30,72 @@ class WxApp(wx.App):
     '''The wx app.'''
     appFrame = None
     def OnInit(self):
-        self.appFrame = AppFrame()
+        self.appFrame = AppFrame(parent=None, title='Variance by Binary Lion Studios', size=(500, 300))
         self.appFrame.Show()
         return True
     
 class AppFrame(wx.Frame):
     '''The application frame that contains all the various configuration panels.'''
+    appPanel = None
+    def __init__(self, *args, **kwargs):
+        wx.Frame.__init__(self, *args, **kwargs)
+        self.createChildren()
+    def createChildren(self):
+        self.appPanel = AppPanel(parent=self)
+        self.Panel = self.appPanel
+        self.Fit()
+        
+class AppPanel(wx.Panel):
     periodPanel = None
-    def __init__(self):
-        wx.Frame.__init__(self, parent=None, title='Variance by Binary Lion Studios', size=(500, 300))
-        self.periodPanel = PeriodPanel(self)
-        self.arrangePanels()
-    def arrangePanels(self):
-        '''Arranges the high level panels.'''
-        vbox = wx.BoxSizer(wx.VERTICAL)
+    actionsPanel = None
+    def __init__(self, *args, **kwargs):
+        wx.Panel.__init__(self, *args, **kwargs)
+        self.createChildren()
+    def createChildren(self):
+        self.periodPanel = PeriodPanel(parent=self)
+        self.actionsPanel = ActionsPanel(parent=self)
+        
+        rootSizer = wx.BoxSizer(wx.VERTICAL)
+        vbox = wx.BoxSizer(wx.VERTICAL)        
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         hbox.Add(self.periodPanel, 1)
-        vbox.Add(hbox, 1)
-        self.SetAutoLayout(True)
-        self.SetSizer(vbox)
-        self.Layout()
+        
+        vbox.Add(hbox, 0)
+        vbox.Add(self.actionsPanel, 1, wx.ALIGN_BOTTOM | wx.EXPAND)
+        
+        rootSizer.Add(vbox, 1, wx.EXPAND | wx.ALL, border=APP_BORDER)
+        
+        self.SetSizerAndFit(rootSizer)
         
 class PeriodPanel(wx.Panel):
     '''This panel contains the options for how often to change the wallpaper.'''
     radioBox = None
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
+    def __init__(self, *args, **kwargs):
+        wx.Panel.__init__(self, *args, **kwargs)
         self.createChildren()
     def createChildren(self):
         self.radioBox = wx.RadioBox(self, majorDimension=1, label='Change my wallpaper:', choices=['Every time I log in', 'Every hour', 'Every 30 minutes'])
         vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add(self.radioBox, 0, wx.TOP | wx.LEFT, COMPONENT_BORDER)
-        self.SetAutoLayout(True)
-        self.SetSizer(vbox)
-        self.Layout()
+        vbox.Add(self.radioBox, 0)
+        
+        self.SetSizerAndFit(vbox)
+        
+class ActionsPanel(wx.Panel):
+    okButton = None
+    '''This panel contains the action buttons.'''
+    def __init__(self, *args, **kwargs):
+        wx.Panel.__init__(self, *args, **kwargs)
+        self.createChildren()
+    def createChildren(self):
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+        
+        startupCheckbox = wx.CheckBox(self, label='Start Variance when windows starts')
+
+        self.okButton = wx.Button(self, wx.ID_APPLY, '&Apply changes')
+        self.okButton.SetDefault()
+        
+        hbox.Add(startupCheckbox, 0, wx.ALIGN_BOTTOM)
+        hbox.Add((10,0), 1)
+        hbox.Add(self.okButton, 0, wx.ALIGN_BOTTOM)
+        
+        self.SetSizerAndFit(hbox)
