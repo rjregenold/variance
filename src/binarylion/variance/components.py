@@ -1,4 +1,7 @@
 '''
+This module contains the various wx components
+that make up the user interface of the application.
+
 Copyright 2010 Binary Lion Studios, LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +16,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-components.py
-This module contains the various wx components
-that make up the user interface of the application.
-
 @author: RJ Regenold
 '''
 
 import wx
 
+# The standard component border size
 COMPONENT_BORDER = 5
 
 class WxApp(wx.App):

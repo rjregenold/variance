@@ -1,4 +1,6 @@
 '''
+Main module that bootstraps the application.
+
 Copyright 2010 Binary Lion Studios, LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +15,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-main.py
-Main module that bootstraps the application.
-
 @author: RJ Regenold
 '''
+
+# TODO: Look at python gettext for localization
+# TODO: Think about rating system. Allow user to thumbs up/down a wallpaper, etc...
+# TODO: Need to rename startup command, because same module will be used for 'startup' app too.
 
 from binarylion.variance import AppFacade, components
         
