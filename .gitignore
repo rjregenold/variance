@@ -1,0 +1,9 @@
+
+.project
+.pydevproject
+image.bmp
+image.jpg
+data/data.db
+*.pyc
+build
+dist
