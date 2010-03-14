@@ -37,8 +37,8 @@ class PeriodPanelMediator(Mediator, IMediator):
         ]
     def handleNotification(self, note):
         if note.getName() == AppFacade.ENVIRONMENT_READY:
-            self.setDefaultValue()
-    def setDefaultValue(self):
+            self.setDefaultValues()
+    def setDefaultValues(self):
         prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
         print prefs.prefs().period
         index = enum.PERIOD_VALUES.getIndex(prefs.prefs().period)
@@ -48,6 +48,26 @@ class PeriodPanelMediator(Mediator, IMediator):
         prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
         prefs.prefs().period = enum.PERIOD_VALUES.items[self.viewComponent.radioBox.GetSelection()]['value']
         print prefs.prefs().period
+        
+class ImageDirPanelMediator(Mediator, IMediator):
+    NAME = 'image dir panel mediator'
+    def __init__(self, viewComponent):
+        Mediator.__init__(self, ImageDirPanelMediator.NAME, viewComponent)
+        # Add event listeners
+        self.viewComponent.imageDir.Bind(wx.EVT_DIRPICKER_CHANGED, self.onImageDirChanged)
+    def listNotificationInterests(self):
+        return [
+            AppFacade.ENVIRONMENT_READY
+        ]
+    def handleNotification(self, note):
+        if note.getName() == AppFacade.ENVIRONMENT_READY:
+            self.setDefaultValues()
+    def setDefaultValues(self):
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        self.viewComponent.imageDir.SetPath(prefs.prefs().imgDir)
+    def onImageDirChanged(self, e):
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        prefs.prefs().imgDir = self.viewComponent.imageDir.GetPath()
 
 class ActionsPanelMediator(Mediator, IMediator):
     '''The actions panel mediator.'''
@@ -55,6 +75,22 @@ class ActionsPanelMediator(Mediator, IMediator):
     def __init__(self, viewComponent):
         Mediator.__init__(self, ActionsPanelMediator.NAME, viewComponent)
         # Add event listeners
+        self.viewComponent.startupCheckbox.Bind(wx.EVT_CHECKBOX, self.onStartupToggled)
         self.viewComponent.okButton.Bind(wx.EVT_BUTTON, self.onOkClicked)
+    def listNotificationInterests(self):
+        return [
+            AppFacade.ENVIRONMENT_READY
+        ]
+    def handleNotification(self, note):
+        if note.getName() == AppFacade.ENVIRONMENT_READY:
+            self.setDefaultValues()
+    def setDefaultValues(self):
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        print prefs.prefs().startup
+        self.viewComponent.startupCheckbox.SetValue(prefs.prefs().startup)
+    def onStartupToggled(self, e):
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        prefs.prefs().startup = self.viewComponent.startupCheckbox.IsChecked()
+        print prefs.prefs().startup
     def onOkClicked(self, e):
         self.sendNotification(AppFacade.APPLY_CHANGES)

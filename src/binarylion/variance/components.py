@@ -49,19 +49,23 @@ class AppFrame(wx.Frame):
 class AppPanel(wx.Panel):
     periodPanel = None
     actionsPanel = None
+    imageDirPanel = None
     def __init__(self, *args, **kwargs):
         wx.Panel.__init__(self, *args, **kwargs)
         self.createChildren()
     def createChildren(self):
         self.periodPanel = PeriodPanel(parent=self)
+        self.imageDirPanel = ImageDirPanel(parent=self)
         self.actionsPanel = ActionsPanel(parent=self)
         
         rootSizer = wx.BoxSizer(wx.VERTICAL)
         vbox = wx.BoxSizer(wx.VERTICAL)        
         hbox = wx.BoxSizer(wx.HORIZONTAL)
-        hbox.Add(self.periodPanel, 1)
+        hbox.Add(self.periodPanel, 0)
+        hbox.Add((10,0), 1)
+        hbox.Add(self.imageDirPanel, 0)
         
-        vbox.Add(hbox, 0)
+        vbox.Add(hbox, 0, wx.EXPAND)
         vbox.Add(self.actionsPanel, 1, wx.ALIGN_BOTTOM | wx.EXPAND)
         
         rootSizer.Add(vbox, 1, wx.EXPAND | wx.ALL, border=APP_BORDER)
@@ -81,8 +85,27 @@ class PeriodPanel(wx.Panel):
         
         self.SetSizerAndFit(vbox)
         
+class ImageDirPanel(wx.Panel):
+    '''This panel contains the directory selector to pick the image directory.'''
+    imageDir = None
+    def __init__(self, *args, **kwargs):
+        wx.Panel.__init__(self, *args, **kwargs)
+        self.createChildren()
+    def createChildren(self):
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        
+        label = wx.StaticText(self, label='Select image directory:')
+        self.imageDir = wx.DirPickerCtrl(self, path='', message='Please select the directory that contains your wallpaper images.')
+        self.imageDir.SetMinSize((300, 25))
+        
+        vbox.Add(label, 0)
+        vbox.Add(self.imageDir, 0)
+        
+        self.SetSizerAndFit(vbox)
+        
 class ActionsPanel(wx.Panel):
     okButton = None
+    startupCheckbox = None
     '''This panel contains the action buttons.'''
     def __init__(self, *args, **kwargs):
         wx.Panel.__init__(self, *args, **kwargs)
@@ -90,12 +113,12 @@ class ActionsPanel(wx.Panel):
     def createChildren(self):
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         
-        startupCheckbox = wx.CheckBox(self, label='Start Variance when windows starts')
+        self.startupCheckbox = wx.CheckBox(self, label='Start Variance when windows starts')
 
         self.okButton = wx.Button(self, wx.ID_APPLY, '&Apply changes')
         self.okButton.SetDefault()
         
-        hbox.Add(startupCheckbox, 0, wx.ALIGN_BOTTOM)
+        hbox.Add(self.startupCheckbox, 0, wx.ALIGN_BOTTOM)
         hbox.Add((10,0), 1)
         hbox.Add(self.okButton, 0, wx.ALIGN_BOTTOM)
         

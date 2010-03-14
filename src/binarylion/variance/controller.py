@@ -40,6 +40,7 @@ class ViewInitCommand(SimpleCommand, ICommand):
     def execute(self, note):
         appPanel = note.getBody()
         self.facade.registerMediator(view.PeriodPanelMediator(appPanel.periodPanel))
+        self.facade.registerMediator(view.ImageDirPanelMediator(appPanel.imageDirPanel))
         self.facade.registerMediator(view.ActionsPanelMediator(appPanel.actionsPanel))
         
 class CommandInitCommand(SimpleCommand, ICommand):

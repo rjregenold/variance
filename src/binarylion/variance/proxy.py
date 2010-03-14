@@ -63,7 +63,7 @@ class PrefsProxy(Proxy, IProxy):
             if pref.key == enum.PREF_KEYS.IMG_DIR:
                 pref.value = self.prefs().imgDir
             elif pref.key == enum.PREF_KEYS.STARTUP:
-                pref.value = self.prefs().startup
+                pref.value = 'True' if self.prefs().startup else 'False'
             elif pref.key == enum.PREF_KEYS.PERIOD:
                 pref.value = self.prefs().period
             session.add(pref)
@@ -77,7 +77,7 @@ class PrefsProxy(Proxy, IProxy):
             if pref.key == enum.PREF_KEYS.IMG_DIR:
                 self.prefs().imgDir = pref.value
             elif pref.key == enum.PREF_KEYS.STARTUP:
-                self.prefs().startup = pref.value
+                self.prefs().startup = pref.value == 'True'
             elif pref.key == enum.PREF_KEYS.PERIOD:
                 self.prefs().period = pref.value
         print self.prefs()
