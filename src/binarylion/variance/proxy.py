@@ -23,10 +23,11 @@ from binarylion.variance import model
 import os
 from puremvc.interfaces import IProxy
 from puremvc.patterns.proxy import Proxy
+from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
 
 Session = sessionmaker()
+session = None
 
 class EnvProxy(Proxy, IProxy):
     NAME = 'env proxy'
@@ -39,6 +40,7 @@ class EnvProxy(Proxy, IProxy):
         dbfile = os.path.join(root, 'data.db')
         engine = create_engine('sqlite:///%s' % dbfile, echo=True)
         Session.configure(autoflush=True, autocommit=False, bind=engine)
+        session = Session()
         if not os.path.exists(dbfile):
             model.Base.metadata.create_all(Session().bind)
         
@@ -47,9 +49,14 @@ class PrefsProxy(Proxy, IProxy):
     NAME = 'prefs proxy'
     def __init__(self):
         Proxy.__init__(self, PrefsProxy.NAME)
+    def getImgDir(self):
+        return session.query(model.Pref.value).filter_by(key='imgDir')
     def save(self):
         print 'Would save prefs'
         session = Session()
         imgDir = model.Pref('imgDir', r'C:\Documents and Settings\rregenol\My Documents\My Pictures\wallpaper')
-        session.add(imgDir)
+        try:
+            session.add(imgDir)
+        except exc.IntegrityError:
+            print 'Already set'
         session.commit()
