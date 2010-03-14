@@ -18,16 +18,15 @@ limitations under the License.
 @author: RJ Regenold
 '''
 
-from binarylion.variance import model
+from binarylion.variance import model, enum
 
-import os
+import os, winshell
 from puremvc.interfaces import IProxy
 from puremvc.patterns.proxy import Proxy
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker()
-session = None
 
 class EnvProxy(Proxy, IProxy):
     NAME = 'env proxy'
@@ -40,23 +39,36 @@ class EnvProxy(Proxy, IProxy):
         dbfile = os.path.join(root, 'data.db')
         engine = create_engine('sqlite:///%s' % dbfile, echo=True)
         Session.configure(autoflush=True, autocommit=False, bind=engine)
-        session = Session()
         if not os.path.exists(dbfile):
-            model.Base.metadata.create_all(Session().bind)
+            session = Session()
+            model.Base.metadata.create_all(session.bind)
+            session.add(model.Pref(enum.PREF_KEYS.IMG_DIR, winshell.my_documents()))
+            session.add(model.Pref(enum.PREF_KEYS.STARTUP, 'True'))
+            session.add(model.Pref(enum.PREF_KEYS.PERIOD, enum.PERIOD.EVERY_LOG_IN))
+            session.commit()
         
 class PrefsProxy(Proxy, IProxy):
     '''The prefs proxy.'''
     NAME = 'prefs proxy'
     def __init__(self):
-        Proxy.__init__(self, PrefsProxy.NAME)
+        Proxy.__init__(self, PrefsProxy.NAME, model.Prefs)
     def getImgDir(self):
-        return session.query(model.Pref.value).filter_by(key='imgDir')
+        pref = Session().query(model.Pref).filter(model.Pref.key==enum.PREF_KEYS.IMG_DIR).first()
+        return pref.value
     def save(self):
         print 'Would save prefs'
         session = Session()
-        imgDir = model.Pref('imgDir', r'C:\Documents and Settings\rregenol\My Documents\My Pictures\wallpaper')
+        for pref in session.query(model.Pref).all():
+            if pref.key == enum.PREF_KEYS.IMG_DIR:
+                pref.value = self.prefs().imgDir
+            elif pref.key == enum.PREF_KEYS.STARTUP:
+                pref.value = self.prefs().startup
+            elif pref.key == enum.PREF_KEYS.PERIOD:
+                pref.value = self.prefs().period
+            session.add(pref)
         try:
-            session.add(imgDir)
+            session.commit()
         except exc.IntegrityError:
-            print 'Already set'
-        session.commit()
+            print 'Something bad happened.'
+    def prefs(self):
+        return self.data

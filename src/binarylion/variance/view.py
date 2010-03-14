@@ -25,6 +25,11 @@ from puremvc.interfaces import IMediator
 
 import wx
 
+class PeriodPanelMediator(Mediator, IMediator):
+    NAME = 'period panel mediator'
+    def __init__(self, viewComponent):
+        Mediator.__init__(self, PeriodPanelMediator.NAME, viewComponent)
+
 class ActionsPanelMediator(Mediator, IMediator):
     '''The actions panel mediator.'''
     NAME = 'actions panel mediator'

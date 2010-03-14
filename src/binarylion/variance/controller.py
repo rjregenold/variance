@@ -56,4 +56,5 @@ class ApplyChangesCommand(SimpleCommand, ICommand):
     def execute(self, note):
         print 'Saving changes'
         prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        print prefs.getImgDir()
         prefs.save()

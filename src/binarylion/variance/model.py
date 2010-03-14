@@ -19,3 +19,8 @@ class Pref(Base):
         self.value = value
     def __repr__(self):
         return "<Pref('%s', '%s')>" % (self.key, self.value)
+    
+class Prefs(object):
+    imgDir = None
+    startup = False
+    period = None
