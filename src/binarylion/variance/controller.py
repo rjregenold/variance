@@ -18,7 +18,7 @@ limitations under the License.
 @author: RJ Regenold
 '''
 
-from binarylion.variance import AppFacade, model, view
+from binarylion.variance import AppFacade, proxy, view
 
 from puremvc.interfaces import ICommand
 from puremvc.patterns.command import SimpleCommand, MacroCommand
@@ -28,6 +28,12 @@ class StartupCommand(MacroCommand, ICommand):
         self.addSubCommand(ModelInitCommand)
         self.addSubCommand(ViewInitCommand)
         self.addSubCommand(CommandInitCommand)
+        self.addSubCommand(SetupEnvironmentCommand)
+        
+class SetupEnvironmentCommand(SimpleCommand, ICommand):
+    def execute(self, note):
+        env = self.facade.retrieveProxy(proxy.EnvProxy.NAME)
+        env.setup()
         
 class ViewInitCommand(SimpleCommand, ICommand):
     '''Command that registers mediators.'''
@@ -43,10 +49,11 @@ class CommandInitCommand(SimpleCommand, ICommand):
 class ModelInitCommand(SimpleCommand, ICommand):
     '''Command that registers proxies.'''
     def execute(self, note):
-        self.facade.registerProxy(model.PrefsProxy())
+        self.facade.registerProxy(proxy.EnvProxy())
+        self.facade.registerProxy(proxy.PrefsProxy())
     
 class ApplyChangesCommand(SimpleCommand, ICommand):
     def execute(self, note):
         print 'Saving changes'
-        proxy = self.facade.retrieveProxy(model.PrefsProxy.NAME)
-        proxy.save()
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        prefs.save()
