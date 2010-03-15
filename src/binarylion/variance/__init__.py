@@ -23,9 +23,14 @@ from puremvc.patterns.facade import Facade
 class AppFacade(Facade):
     '''The application facade.'''
     STARTUP = 'startup'
+    SERVICE_STARTUP = 'service startup'
     DATABASE_READY = 'database ready'
+    INIT_ENVIRONMENT = 'init environment'
     ENVIRONMENT_READY = 'env ready'
     APPLY_CHANGES = 'apply changes'
+    PREFS_SAVED = 'prefs saved'
+    INSTALL_STARTUP_SERVICE = 'install startup service'
+    REMOVE_STARTUP_SERVICE = 'remove startup service'
     @staticmethod
     def getInstance():
         return AppFacade()
@@ -37,6 +42,7 @@ class AppFacade(Facade):
     def initializeController(self):
         super(AppFacade, self).initializeController()
         # FIXME: Not a fan of this. Find a way to avoid the circular references.
-        from binarylion.variance.controller import StartupCommand
+        from binarylion.variance.controller import StartupCommand, ServiceStartupCommand
         # register startup command
         super(AppFacade, self).registerCommand(AppFacade.STARTUP, StartupCommand)
+        super(AppFacade, self).registerCommand(AppFacade.SERVICE_STARTUP, ServiceStartupCommand)

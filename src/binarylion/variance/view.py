@@ -79,11 +79,14 @@ class ActionsPanelMediator(Mediator, IMediator):
         self.viewComponent.okButton.Bind(wx.EVT_BUTTON, self.onOkClicked)
     def listNotificationInterests(self):
         return [
-            AppFacade.ENVIRONMENT_READY
+            AppFacade.ENVIRONMENT_READY,
+            AppFacade.PREFS_SAVED
         ]
     def handleNotification(self, note):
         if note.getName() == AppFacade.ENVIRONMENT_READY:
             self.setDefaultValues()
+        elif note.getName() == AppFacade.PREFS_SAVED:
+            self.onPrefsSaved(note.getBody())
     def setDefaultValues(self):
         prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
         print prefs.prefs().startup
@@ -94,3 +97,8 @@ class ActionsPanelMediator(Mediator, IMediator):
         print prefs.prefs().startup
     def onOkClicked(self, e):
         self.sendNotification(AppFacade.APPLY_CHANGES)
+    def onPrefsSaved(self, prefs):
+        if(prefs.startup):
+            self.facade.sendNotification(AppFacade.INSTALL_STARTUP_SERVICE)
+        else:
+            self.facade.sendNotification(AppFacade.REMOVE_STARTUP_SERVICE)

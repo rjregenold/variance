@@ -20,7 +20,7 @@ limitations under the License.
 
 # TODO: Look at python gettext for localization
 # TODO: Think about rating system. Allow user to thumbs up/down a wallpaper, etc...
-# TODO: Need to rename startup command, because same module will be used for 'startup' app too.
+# TODO: Replace print stmts with python logging
 
 from binarylion.variance import AppFacade, components
         

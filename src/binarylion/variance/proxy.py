@@ -25,6 +25,7 @@ from puremvc.interfaces import IProxy
 from puremvc.patterns.proxy import Proxy
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
+from sqlite3 import dbapi2 as sqlite
 
 Session = sessionmaker()
 
@@ -33,17 +34,18 @@ class EnvProxy(Proxy, IProxy):
     def __init__(self):
         Proxy.__init__(self, EnvProxy.NAME)
     def setup(self):
+        print 'Setting up environment'
         root = 'data'
         if not os.path.exists(root):
             os.makedirs(root)
         dbfile = os.path.join(root, 'data.db')
-        engine = create_engine('sqlite:///%s' % dbfile, echo=True)
+        engine = create_engine('sqlite:///%s' % dbfile, echo=True, module=sqlite)
         Session.configure(autoflush=True, autocommit=False, bind=engine)
         if not os.path.exists(dbfile):
             session = Session()
             model.Base.metadata.create_all(session.bind)
             session.add(model.Pref(enum.PREF_KEYS.IMG_DIR, winshell.my_documents()))
-            session.add(model.Pref(enum.PREF_KEYS.STARTUP, 'True'))
+            session.add(model.Pref(enum.PREF_KEYS.STARTUP, 'False'))
             session.add(model.Pref(enum.PREF_KEYS.PERIOD, enum.PERIOD.EVERY_LOG_IN))
             session.commit()
         self.facade.sendNotification(AppFacade.DATABASE_READY)
@@ -71,6 +73,7 @@ class PrefsProxy(Proxy, IProxy):
             session.commit()
         except exc.IntegrityError:
             print 'Something bad happened.'
+        self.facade.sendNotification(AppFacade.PREFS_SAVED, self.prefs())
     def load(self):
         for pref in Session().query(model.Pref).all():
             print pref

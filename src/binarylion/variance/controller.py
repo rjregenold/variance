@@ -18,10 +18,11 @@ limitations under the License.
 @author: RJ Regenold
 '''
 
-from binarylion.variance import AppFacade, proxy, view
+from binarylion.variance import AppFacade, proxy, view, service, enum
 
 from puremvc.interfaces import ICommand
 from puremvc.patterns.command import SimpleCommand, MacroCommand
+import os
         
 class StartupCommand(MacroCommand, ICommand):
     def initializeMacroCommand(self):
@@ -48,6 +49,8 @@ class CommandInitCommand(SimpleCommand, ICommand):
     def execute(self, note):
         self.facade.registerCommand(AppFacade.DATABASE_READY, DatabaseReadyCommand)
         self.facade.registerCommand(AppFacade.APPLY_CHANGES, ApplyChangesCommand)
+        self.facade.registerCommand(AppFacade.INSTALL_STARTUP_SERVICE, InstallStartupServiceCommand)
+        self.facade.registerCommand(AppFacade.REMOVE_STARTUP_SERVICE, RemoveStartupServiceCommand)
     
 class ModelInitCommand(SimpleCommand, ICommand):
     '''Command that registers proxies.'''
@@ -65,3 +68,36 @@ class ApplyChangesCommand(SimpleCommand, ICommand):
         print 'Saving changes'
         prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
         prefs.save()
+        
+class InstallStartupServiceCommand(SimpleCommand, ICommand):
+    def execute(self, note):
+        print 'Installing startup service'
+        windowsService = service.WindowsService()
+        targetPath = os.path.join(os.getcwd(), enum.STARTUP_APP_NAME)
+        windowsService.installStartup(targetPath, os.getcwd(), enum.SHORTCUT_NAME)
+        
+class RemoveStartupServiceCommand(SimpleCommand, ICommand):
+    def execute(self, note):
+        print 'Removing startup service'
+        windowsService = service.WindowsService()
+        windowsService.removeStartup(enum.SHORTCUT_NAME)
+        
+### Startup service commands ###
+
+class ServiceStartupCommand(SimpleCommand, ICommand):
+    def execute(self, note):
+        # Register proxies
+        self.facade.registerProxy(proxy.EnvProxy())
+        self.facade.registerProxy(proxy.PrefsProxy())
+        # Register commands
+        self.facade.registerCommand(AppFacade.INIT_ENVIRONMENT, SetupEnvironmentCommand)
+        self.facade.registerCommand(AppFacade.DATABASE_READY, DatabaseReadyCommand)
+        self.facade.registerCommand(AppFacade.ENVIRONMENT_READY, ServiceEnvironmentReadyCommand)
+        # Kick things off
+        self.facade.sendNotification(AppFacade.INIT_ENVIRONMENT)
+        
+class ServiceEnvironmentReadyCommand(SimpleCommand, ICommand):
+    def execute(self, note):
+        prefs = self.facade.retrieveProxy(proxy.PrefsProxy.NAME)
+        startupService = service.StartupService(prefs.prefs().imgDir, int(prefs.prefs().period))
+        startupService.run()
