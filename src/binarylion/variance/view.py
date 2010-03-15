@@ -25,6 +25,18 @@ from puremvc.interfaces import IMediator
 
 import wx
 
+class AppPanelMediator(Mediator, IMediator):
+    NAME = 'app panel mediator'
+    def __init__(self, viewComponent):
+        Mediator.__init__(self, AppPanelMediator.NAME, viewComponent)
+    def listNotificationInterests(self):
+        return [
+            AppFacade.PREFS_SAVED
+        ]
+    def handleNotification(self, note):
+        if note.getName() == AppFacade.PREFS_SAVED:
+            self.viewComponent.showPrefsSaved()
+
 class PeriodPanelMediator(Mediator, IMediator):
     NAME = 'period panel mediator'
     def __init__(self, viewComponent):

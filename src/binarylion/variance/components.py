@@ -41,6 +41,7 @@ class AppFrame(wx.Frame):
     def __init__(self, *args, **kwargs):
         wx.Frame.__init__(self, *args, **kwargs)
         self.createChildren()
+        self.SetIcon(wx.Icon('variance.ico', wx.BITMAP_TYPE_ICO))
     def createChildren(self):
         self.appPanel = AppPanel(parent=self)
         self.Panel = self.appPanel
@@ -71,6 +72,10 @@ class AppPanel(wx.Panel):
         rootSizer.Add(vbox, 1, wx.EXPAND | wx.ALL, border=APP_BORDER)
         
         self.SetSizerAndFit(rootSizer)
+    def showPrefsSaved(self):
+        dialog = wx.MessageDialog(self, message='Your preferences have been saved.', caption='Preferences saved', style=wx.OK | wx.ICON_INFORMATION)
+        dialog.ShowModal()
+        dialog.Destroy()
         
 class PeriodPanel(wx.Panel):
     '''This panel contains the options for how often to change the wallpaper.'''

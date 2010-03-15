@@ -1,7 +1,22 @@
 '''
-Created on Mar 14, 2010
+This module contains various constants used throughout
+the application.
 
-@author: rregenol
+Copyright 2010 Binary Lion Studios, LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+@author: RJ Regenold
 '''
 
 STARTUP_APP_NAME = 'startup.exe'
@@ -25,7 +40,7 @@ class PERIOD(object):
     EVERY_LOG_IN = '-1'
     
 class PERIOD_VALUES(object):
-    items = ({'label': 'Every time I log in', 'value': -1}, {'label': 'Every hour', 'value': 60}, {'label': 'Every 30 minutes', 'value': 30}, {'label': 'Every minute', 'value': 1})
+    items = ({'label': 'Every time I log in', 'value': -1}, {'label': 'Every hour', 'value': 60}, {'label': 'Every 30 minutes', 'value': 30})
     @staticmethod
     def toStringList():
         return [item['label'] for item in PERIOD_VALUES.items]

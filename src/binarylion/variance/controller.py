@@ -40,6 +40,7 @@ class ViewInitCommand(SimpleCommand, ICommand):
     '''Command that registers mediators.'''
     def execute(self, note):
         appPanel = note.getBody()
+        self.facade.registerMediator(view.AppPanelMediator(appPanel))
         self.facade.registerMediator(view.PeriodPanelMediator(appPanel.periodPanel))
         self.facade.registerMediator(view.ImageDirPanelMediator(appPanel.imageDirPanel))
         self.facade.registerMediator(view.ActionsPanelMediator(appPanel.actionsPanel))
